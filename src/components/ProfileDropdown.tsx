@@ -21,12 +21,12 @@ export const ProfileDropdown = () => {
       {/* Profile trigger */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-3 p-2 rounded-lg hover:bg-(var(--bg-item)) transition-colors"
+        className="flex cursor-pointer items-center gap-3 p-2 rounded-lg hover:bg-(var(--bg-item)) transition-colors"
       >
-        <div className="w-9 h-9 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-medium">
+        <div className="w-9 h-9 rounded-full border-2 border-gray-500 flex items-center justify-center text-white text-sm font-medium transition-transform duration-300 ease-in-out hover:scale-110">
           {user?.name?.charAt(0) || "U"}
         </div>
-        <div className="text-left hidden md:block">
+        {/* <div className="text-left hidden md:block">
           <p
             className="text-sm font-medium"
             style={{ color: "var(--text-primary)" }}
@@ -36,8 +36,8 @@ export const ProfileDropdown = () => {
           <p className="text-xs" style={{ color: "var(--text-muted)" }}>
             {user?.email || "user@example.com"}
           </p>
-        </div>
-        <svg
+        </div> */}
+        {/* <svg
           className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""}`}
           style={{ color: "var(--text-muted)" }}
           viewBox="0 0 24 24"
@@ -46,7 +46,7 @@ export const ProfileDropdown = () => {
           strokeWidth="2"
         >
           <path d="M6 9l6 6 6-6" />
-        </svg>
+        </svg> */}
       </button>
 
       {/* Dropdown menu */}
@@ -69,7 +69,7 @@ export const ProfileDropdown = () => {
               style={{ borderColor: "var(--border-primary)" }}
             >
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-medium">
+                <div className="w-10 h-10 rounded-full bg--to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-medium">
                   {user?.name?.charAt(0) || "U"}
                 </div>
                 <div className="flex-1">

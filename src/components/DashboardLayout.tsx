@@ -191,7 +191,7 @@ export default function DashboardLayout({
               style={{ borderColor: "var(--border-primary)" }}
             >
               <div className="flex items-center gap-3 px-4 py-3">
-                <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                <div className="w-9 h-9 bg-linear-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
                   {user?.name?.charAt(0) || "U"}
                 </div>
                 <div className="flex-1 min-w-0">

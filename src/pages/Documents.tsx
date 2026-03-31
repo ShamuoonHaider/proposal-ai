@@ -1,5 +1,4 @@
 import {
-  CloudUpload,
   ListFilter,
   Sparkles,
   Eye,
@@ -7,6 +6,7 @@ import {
   File,
 } from "lucide-react";
 import DashboardLayout from "../components/DashboardLayout";
+import { FileUpload } from "../components/FileUpload";
 
 const CATEGORIES = [
   "CV / Resume",
@@ -38,53 +38,13 @@ const SAMPLE_DOCS = [
 ];
 
 function UploadSection() {
+  const handleFileSelect = (files: File[]) => {
+    console.log("Selected files:", files);
+    // TODO: Handle file upload logic here
+  };
+
   return (
-    <div
-      className="rounded-xl border p-8 h-full"
-      style={{
-        backgroundColor: "var(--bg-primary)",
-        borderColor: "var(--border-primary)",
-      }}
-    >
-      <div className="flex flex-col items-center justify-center text-center h-full">
-        <div
-          className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
-          style={{ backgroundColor: "var(--bg-item)" }}
-        >
-          <CloudUpload
-            className="w-8 h-8"
-            style={{ color: "var(--text-primary)" }}
-          />
-        </div>
-        <h2
-          className="text-xl font-medium"
-          style={{ color: "var(--text-primary)" }}
-        >
-          Drag and Drop PDFs
-        </h2>
-        <p className="mt-2" style={{ color: "var(--text-secondary)" }}>
-          Securely transfer your documents to our encrypted AI vault.
-        </p>
-        <p
-          className="mt-1 text-xs font-medium tracking-wide"
-          style={{ color: "var(--text-muted)" }}
-        >
-          ONLY .PDF FILES ARE ACCEPTED.
-        </p>
-        <button
-          className="mt-6 px-6 py-3 text-white font-medium rounded-lg transition-colors cursor-pointer"
-          style={{ backgroundColor: "var(--accent)" }}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.backgroundColor = "var(--accent-hover)")
-          }
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.backgroundColor = "var(--accent)")
-          }
-        >
-          Browse Files
-        </button>
-      </div>
-    </div>
+    <FileUpload onFileSelect={handleFileSelect} />
   );
 }
 
@@ -163,7 +123,7 @@ function DocumentTable() {
         </thead>
         <tbody
           className="divide-y"
-          style={{ divideColor: "var(--border-primary)" }}
+          style={{ borderColor: "var(--border-primary)" }}
         >
           {SAMPLE_DOCS.map((doc) => (
             <tr

@@ -23,7 +23,7 @@ export const ProfileDropdown = () => {
         onClick={() => setIsOpen(!isOpen)}
         className="flex cursor-pointer items-center gap-3 p-2 rounded-lg hover:bg-(var(--bg-item)) transition-colors"
       >
-        <div className="w-9 h-9 rounded-full border-2 border-gray-500 flex items-center justify-center text-white text-sm font-medium transition-transform duration-300 ease-in-out hover:scale-110">
+        <div className="w-9 h-9 rounded-full border-2 border-gray-500 flex items-center justify-center text-gray-500 text-sm font-medium transition-transform duration-300 ease-in-out hover:scale-110">
           {user?.name?.charAt(0) || "U"}
         </div>
         {/* <div className="text-left hidden md:block">

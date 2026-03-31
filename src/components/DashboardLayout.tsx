@@ -4,7 +4,7 @@ import {
   LayoutDashboard,
   FileText,
   BrainCircuit,
-  Copy,
+  Sparkles,
   Settings,
   Plus,
   HelpCircle,
@@ -21,7 +21,7 @@ const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Documents", href: "/documents", icon: FileText },
   { name: "Memory Builder", href: "/memory", icon: BrainCircuit },
-  { name: "Proposals", href: "/proposals", icon: Copy },
+  { name: "Proposals", href: "/proposals", icon: Sparkles },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
@@ -156,7 +156,7 @@ export default function DashboardLayout({
             style={{ borderColor: "var(--border-primary)" }}
           >
             <Link
-              to="/new-proposal"
+              to="/proposals"
               className="flex items-center justify-center gap-2 w-full px-4 py-3 text-white text-sm font-medium rounded-lg transition-colors"
               style={{ backgroundColor: "var(--accent)" }}
               onMouseEnter={(e) =>

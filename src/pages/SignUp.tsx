@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import { useUIStore } from "../store/uiStore";
@@ -7,7 +7,7 @@ import AuthLayout from "../components/AuthLayout";
 
 export default function SignUp() {
   const navigate = useNavigate();
-  const { login } = useAuthStore();
+  const { login, isAuthenticated, checkAuth } = useAuthStore();
   const { setSidebarOpen } = useUIStore();
   const [formData, setFormData] = useState<SignUpFormData>({
     name: "",
@@ -17,6 +17,16 @@ export default function SignUp() {
   const [errors, setErrors] = useState<Partial<SignUpFormData>>({});
   const [serverError, setServerError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -75,7 +85,17 @@ export default function SignUp() {
         return;
       }
 
-      login(data.token, { name: formData.name, email: formData.email });
+      // Token is in data.data.access_token
+      const token = data.data?.access_token || data.token || data.accessToken;
+      
+      if (!token) {
+        setServerError("Server did not return authentication token. Check console for response details.");
+        return;
+      }
+
+      const user = data.data || data.user || { name: formData.name, email: formData.email };
+
+      login(token, user);
       setSidebarOpen(false);
       navigate("/dashboard");
     } catch (err: unknown) {

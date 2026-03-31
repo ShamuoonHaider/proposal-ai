@@ -2,13 +2,15 @@ import { useState, useRef } from "react";
 import { useUIStore } from "../store/uiStore";
 
 interface FileUploadProps {
-  onFileSelect?: (files: File[]) => void;
-  onClear?: () => void;
+  onUploadSuccess?: (response: unknown) => void;
+  onUploadError?: (error: string) => void;
+  category?: string;
 }
 
-export const FileUpload = ({ onFileSelect, onClear }: FileUploadProps) => {
+export const FileUpload = ({ onUploadSuccess, onUploadError, category = "cv" }: FileUploadProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -31,7 +33,6 @@ export const FileUpload = ({ onFileSelect, onClear }: FileUploadProps) => {
 
     if (files.length > 0) {
       setSelectedFiles((prev) => [...prev, ...files]);
-      onFileSelect?.(files);
     }
   };
 
@@ -42,7 +43,6 @@ export const FileUpload = ({ onFileSelect, onClear }: FileUploadProps) => {
 
     if (files.length > 0) {
       setSelectedFiles((prev) => [...prev, ...files]);
-      onFileSelect?.(files);
     }
 
     if (fileInputRef.current) {
@@ -56,12 +56,74 @@ export const FileUpload = ({ onFileSelect, onClear }: FileUploadProps) => {
 
   const handleClear = () => {
     setSelectedFiles([]);
-    onClear?.();
   };
 
-  const handleDone = () => {
-    console.log("Uploading files:", selectedFiles);
-    // TODO: Handle file upload logic here
+  const handleDone = async () => {
+    if (selectedFiles.length === 0) return;
+
+    setUploading(true);
+
+    try {
+      const formData = new FormData();
+      selectedFiles.forEach((file) => {
+        formData.append("file", file);
+      });
+
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        throw new Error("Authentication token not found. Please sign in again.");
+      }
+
+      const res = await fetch("http://192.168.0.129:8000/api/v1/upload-documents", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        let errorMessage = "Upload failed";
+        
+        if (data.message) {
+          errorMessage = data.message;
+        } else if (data.error) {
+          errorMessage = data.error;
+        } else if (data.detail) {
+          errorMessage = Array.isArray(data.detail) 
+            ? data.detail.map((d: any) => d.msg).join(", ")
+            : data.detail;
+        } else if (data.errors) {
+          errorMessage = Array.isArray(data.errors)
+            ? data.errors.map((e: any) => e.message || e.msg || e).join(", ")
+            : "Validation failed";
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      onUploadSuccess?.(data);
+      setSelectedFiles([]);
+    } catch (err: unknown) {
+      let message = "Upload failed";
+      if (err instanceof Error) {
+        console.error("Upload error:", err);
+        console.error("Error name:", err.name);
+        console.error("Error message:", err.message);
+        
+        if (err.message.includes("Failed to fetch")) {
+          message = "CORS Error: The backend server is blocking this request. Please ensure your backend at http://192.168.0.129:8000 has CORS enabled for your frontend origin.";
+        } else {
+          message = err.message;
+        }
+      }
+      onUploadError?.(message);
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -145,25 +207,45 @@ export const FileUpload = ({ onFileSelect, onClear }: FileUploadProps) => {
           <div className="mt-6 flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={handleClear}
-              className="px-6 py-3 font-medium rounded-lg transition-colors border"
+              disabled={uploading}
+              className="px-6 py-3 font-medium rounded-lg transition-colors border disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
                 backgroundColor: "transparent",
                 color: "var(--text-secondary)",
                 borderColor: "var(--border-primary)",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--bg-item)")}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+              onMouseEnter={(e) => {
+                if (!uploading) e.currentTarget.style.backgroundColor = "var(--bg-item)";
+              }}
+              onMouseLeave={(e) => {
+                if (!uploading) e.currentTarget.style.backgroundColor = "transparent";
+              }}
             >
               Clear
             </button>
             <button
               onClick={handleDone}
-              className="px-6 py-3 text-white font-medium rounded-lg transition-colors"
+              disabled={uploading}
+              className="px-6 py-3 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               style={{ backgroundColor: "var(--accent)" }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--accent-hover)")}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "var(--accent)")}
+              onMouseEnter={(e) => {
+                if (!uploading) e.currentTarget.style.backgroundColor = "var(--accent-hover)";
+              }}
+              onMouseLeave={(e) => {
+                if (!uploading) e.currentTarget.style.backgroundColor = "var(--accent)";
+              }}
             >
-              Done
+              {uploading ? (
+                <>
+                  <svg className="animate-spin w-5 h-5 inline-block mr-2" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Uploading...
+                </>
+              ) : (
+                "Done"
+              )}
             </button>
           </div>
         )}

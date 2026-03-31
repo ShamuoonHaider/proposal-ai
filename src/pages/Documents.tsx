@@ -38,13 +38,19 @@ const SAMPLE_DOCS = [
 ];
 
 function UploadSection() {
-  const handleFileSelect = (files: File[]) => {
-    console.log("Selected files:", files);
-    // TODO: Handle file upload logic here
+  const handleUploadSuccess = (response: unknown) => {
+    console.log("Upload successful:", response);
+    // Refresh page or show success notification
+    window.location.reload();
+  };
+
+  const handleUploadError = (error: string) => {
+    console.error("Upload failed:", error);
+    alert(error);
   };
 
   return (
-    <FileUpload onFileSelect={handleFileSelect} />
+    <FileUpload onUploadSuccess={handleUploadSuccess} onUploadError={handleUploadError} />
   );
 }
 

@@ -12,11 +12,10 @@ import {
   Bell,
   History,
   Menu,
-  LogOut,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { ToggleThemeBtn } from "./ToggleThemeBtn";
+import { ProfileDropdown } from "./ProfileDropdown";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -209,19 +208,6 @@ export default function DashboardLayout({
                     {user?.email || "user@example.com"}
                   </p>
                 </div>
-                <button
-                  onClick={handleLogout}
-                  className="p-2 rounded-lg transition-colors"
-                  style={{ color: "var(--text-secondary)" }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.backgroundColor = "var(--bg-item)")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.backgroundColor = "transparent")
-                  }
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
               </div>
             </div>
           </div>
@@ -259,8 +245,6 @@ export default function DashboardLayout({
             </div>
 
             <div className="flex items-center gap-2">
-              <ToggleThemeBtn />
-
               <button
                 className="relative p-2.5 rounded-lg transition-colors"
                 style={{ color: "var(--text-secondary)" }}
@@ -318,9 +302,7 @@ export default function DashboardLayout({
                 Generate AI
               </button>
 
-              <button className="ml-2 w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-medium">
-                {user?.name?.charAt(0) || "U"}
-              </button>
+              <ProfileDropdown />
 
               <button
                 onClick={() => setSidebarOpen(true)}

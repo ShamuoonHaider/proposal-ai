@@ -4,8 +4,9 @@ import SignUp from "./pages/SignUp";
 import Dashboard from "./pages/Dashboard";
 import Documents from "./pages/Documents";
 import MemoryBuilder from "./pages/MemoryBuilder";
-import Templates from "./pages/Templates";
+
 import Settings from "./pages/Settings";
+import Proposals from "./pages/Proposals";
 
 function App() {
   return (
@@ -16,8 +17,8 @@ function App() {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/documents" element={<Documents />} />
       <Route path="/memory" element={<MemoryBuilder />} />
-      <Route path="templates" element={<Templates />} />
-      <Route path="settings" element={<Settings />} />
+      <Route path="/proposals" element={<Proposals />} />
+      <Route path="/settings" element={<Settings />} />
     </Routes>
   );
 }

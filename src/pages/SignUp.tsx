@@ -1,9 +1,13 @@
 import { useState } from 'react'
+import { useAuthStore } from '../store/authStore'
+import { useUIStore } from '../store/uiStore'
 import { useNavigate } from 'react-router-dom'
 import AuthLayout from '../components/AuthLayout'
 
 export default function SignUp() {
   const navigate = useNavigate()
+  const { login } = useAuthStore()
+  const { setSidebarOpen } = useUIStore()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -14,7 +18,6 @@ export default function SignUp() {
     e.preventDefault()
     setLoading(true)
     setError('')
-    setSuccess('')
 
     try {
       const res = await fetch('http://192.168.0.129:8000/api/v1/users/signup', {
@@ -29,10 +32,11 @@ export default function SignUp() {
       }
 
       const data = await res.json()
-      localStorage.setItem('token', data.token)
-      navigate('/documents')
+      login(data.token, { name, email })
+      setSidebarOpen(false)
+      navigate('/dashboard')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
+      setError(err instanceof Error ? err.message : 'Something went wrong')
     } finally {
       setLoading(false)
     }

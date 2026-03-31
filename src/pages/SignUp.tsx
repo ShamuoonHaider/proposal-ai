@@ -9,7 +9,6 @@ export default function SignUp() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
 
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault()
@@ -29,8 +28,9 @@ export default function SignUp() {
         throw new Error(data.message || 'Signup failed')
       }
 
-      setSuccess('User created successfully!')
-      setTimeout(() => navigate('/signin'), 1500)
+      const data = await res.json()
+      localStorage.setItem('token', data.token)
+      navigate('/documents')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
     } finally {
@@ -93,14 +93,6 @@ export default function SignUp() {
         </div>
 
         {error && <p className="text-red-500 text-sm">{error}</p>}
-        {success && (
-          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center gap-2">
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M20 6L9 17l-5-5" />
-            </svg>
-            {success}
-          </div>
-        )}
 
         <button
           type="submit"

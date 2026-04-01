@@ -1,13 +1,15 @@
 import { useState } from "react";
 import DashboardLayout from "../components/DashboardLayout";
-import { Sparkles, Save, Copy } from "lucide-react";
+import { Sparkles, Save, Copy, Loader2, Wand2, Check, Bot } from "lucide-react";
 import { useToastStore } from "../store/toastStore";
 
 export default function NewProposal() {
   const [jobTitle, setJobTitle] = useState("");
   const [jobDetails, setJobDetails] = useState("");
   const [generating, setGenerating] = useState(false);
-  const [generatedProposal, setGeneratedProposal] = useState<string | null>(null);
+  const [generatedProposal, setGeneratedProposal] = useState("");
+  const [streaming, setStreaming] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const handleGenerate = async () => {
     if (!jobTitle || !jobDetails) {
@@ -16,12 +18,17 @@ export default function NewProposal() {
     }
 
     setGenerating(true);
+    setStreaming(true);
+    setGeneratedProposal("");
+    setCopied(false);
 
     try {
       const token = localStorage.getItem("token");
 
       if (!token) {
         useToastStore.error("Authentication required. Please sign in again.");
+        setGenerating(false);
+        setStreaming(false);
         return;
       }
 
@@ -37,9 +44,8 @@ export default function NewProposal() {
         }),
       });
 
-      const data = await res.json();
-
       if (!res.ok) {
+        const data = await res.json();
         let errorMessage = "Failed to generate proposal";
 
         if (res.status === 401) {
@@ -59,13 +65,70 @@ export default function NewProposal() {
         }
 
         useToastStore.error(errorMessage);
+        setGenerating(false);
+        setStreaming(false);
         return;
       }
 
-      // Success - extract proposal from response
-      const proposal = data.data?.proposal || data.proposal;
-      setGeneratedProposal(proposal);
-      useToastStore.success("Proposal generated successfully!");
+      // Handle SSE stream response
+      if (!res.body) {
+        useToastStore.error("Streaming not supported");
+        setGenerating(false);
+        setStreaming(false);
+        return;
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let fullProposal = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        buffer += chunk;
+
+        // Process complete lines
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          const trimmedLine = line.trim();
+          if (!trimmedLine || trimmedLine.startsWith(":")) continue;
+
+          // Remove "data: " prefix
+          const dataStr = trimmedLine.startsWith("data: ") 
+            ? trimmedLine.slice(6) 
+            : trimmedLine;
+
+          try {
+            const event = JSON.parse(dataStr);
+
+            if (event.type === "token" && event.content) {
+              fullProposal += event.content;
+              setGeneratedProposal(fullProposal);
+            } else if (event.type === "complete") {
+              if (event.proposal) {
+                setGeneratedProposal(event.proposal);
+              }
+              setStreaming(false);
+              setGenerating(false);
+              useToastStore.success("Proposal generated successfully!");
+              return;
+            } else if (event.type === "error") {
+              useToastStore.error(event.message || "Generation failed");
+              setStreaming(false);
+              setGenerating(false);
+              return;
+            }
+          } catch (e) {
+            console.error("Failed to parse SSE event:", line);
+          }
+        }
+      }
     } catch (err: unknown) {
       let message = "Failed to generate proposal";
       if (err instanceof Error) {
@@ -76,20 +139,20 @@ export default function NewProposal() {
         }
       }
       useToastStore.error(message);
-    } finally {
       setGenerating(false);
+      setStreaming(false);
     }
   };
 
   const handleCopy = () => {
     if (generatedProposal) {
       navigator.clipboard.writeText(generatedProposal);
-      useToastStore.success("Proposal copied to clipboard!");
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 
   const handleSave = () => {
-    // TODO: Save proposal to backend
     useToastStore.info("Save feature coming soon");
   };
 
@@ -182,25 +245,7 @@ export default function NewProposal() {
               >
                 {generating ? (
                   <>
-                    <svg
-                      className="animate-spin w-5 h-5"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      />
-                    </svg>
+                    <Loader2 className="w-5 h-5 animate-spin" />
                     Generating...
                   </>
                 ) : (
@@ -256,31 +301,55 @@ export default function NewProposal() {
                     onClick={handleCopy}
                     disabled={!generatedProposal}
                     className="p-2 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                    style={{ color: "var(--text-secondary)" }}
+                    style={{ color: copied ? "#22c55e" : "var(--text-secondary)" }}
                     onMouseEnter={(e) => {
-                      if (generatedProposal) {
+                      if (generatedProposal && !copied) {
                         e.currentTarget.style.backgroundColor = "var(--bg-item)";
                       }
                     }}
                     onMouseLeave={(e) => {
-                      if (generatedProposal) {
+                      if (generatedProposal && !copied) {
                         e.currentTarget.style.backgroundColor = "transparent";
                       }
                     }}
                   >
-                    <Copy className="w-5 h-5" />
+                    {copied ? (
+                      <Check className="w-5 h-5" />
+                    ) : (
+                      <Copy className="w-5 h-5" />
+                    )}
                   </button>
                 </div>
               </div>
 
               {/* Content */}
               <div className="flex-1 p-6 overflow-y-auto">
-                {generatedProposal ? (
+                {streaming && !generatedProposal ? (
+                  <div className="h-full flex flex-col items-start">
+                    {/* Animated thinking indicator */}
+                    <div className="flex items-center gap-3 mb-6">
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center animate-pulse-glow"
+                        style={{ backgroundColor: "var(--bg-item)" }}
+                      >
+                        <Bot
+                          className="w-6 h-6 animate-breathe"
+                          style={{ color: "var(--accent)" }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ) : generatedProposal ? (
                   <div
                     className="prose max-w-none"
                     style={{ color: "var(--text-primary)" }}
                   >
-                    <p className="whitespace-pre-wrap">{generatedProposal}</p>
+                    <p className="whitespace-pre-wrap">
+                      {generatedProposal}
+                      {streaming && (
+                        <span className="inline-block w-2 h-5 ml-1 bg-current animate-pulse" />
+                      )}
+                    </p>
                   </div>
                 ) : (
                   <div className="h-full flex flex-col items-center justify-center text-center">
@@ -288,17 +357,10 @@ export default function NewProposal() {
                       className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
                       style={{ backgroundColor: "var(--bg-item)" }}
                     >
-                      <svg
+                      <Wand2
                         className="w-8 h-8"
                         style={{ color: "var(--text-muted)" }}
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                      </svg>
+                      />
                     </div>
                     <p
                       className="text-sm"

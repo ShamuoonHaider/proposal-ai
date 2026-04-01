@@ -5,7 +5,7 @@ import { useUIStore } from "../store/uiStore";
 const MAX_OFFSET = 24;
 
 export const ToggleThemeBtn = () => {
-  const { theme, toggleTheme, setTheme } = useUIStore();
+  const { theme, toggleTheme } = useUIStore();
   const isDark = theme === "dark";
 
   const [isDragging, setIsDragging] = useState(false);

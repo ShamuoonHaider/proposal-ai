@@ -8,10 +8,10 @@ import {
   Settings,
   Plus,
   HelpCircle,
-  Search,
-  Bell,
   History,
   Menu,
+  Search,
+  Bell,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
@@ -31,7 +31,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const { sidebarOpen, setSidebarOpen, theme, setTheme } = useUIStore();
-  const { user, logout, isAuthenticated, isLoading, checkAuth } = useAuthStore();
+  const { user, isAuthenticated, isLoading, checkAuth } = useAuthStore();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -63,11 +63,6 @@ export default function DashboardLayout({
   }, [theme]);
 
   const isActive = (href: string) => location.pathname === href;
-
-  const handleLogout = () => {
-    logout();
-    navigate("/signin");
-  };
 
   // Show loading state while checking auth
   if (isLoading || !isAuthenticated) {

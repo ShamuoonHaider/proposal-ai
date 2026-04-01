@@ -40,13 +40,12 @@ const SAMPLE_DOCS = [
 function UploadSection() {
   const handleUploadSuccess = (response: unknown) => {
     console.log("Upload successful:", response);
-    // Refresh page or show success notification
-    window.location.reload();
+    // Toast notification is already shown by FileUpload component
   };
 
   const handleUploadError = (error: string) => {
     console.error("Upload failed:", error);
-    alert(error);
+    // Toast notification is already shown by FileUpload component
   };
 
   return (
@@ -370,7 +369,8 @@ export default function Documents() {
           <p
             className="mt-2 max-w-3xl"
             style={{ color: "var(--text-secondary)" }}
-          >
+          >￼
+
             Elevate your proposals with architectural precision. Upload,
             categorize, and embed your professional history into the AI
             intelligence engine.

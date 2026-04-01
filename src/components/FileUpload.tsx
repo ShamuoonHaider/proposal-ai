@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { useUIStore } from "../store/uiStore";
+import { useToastStore } from "../store/toastStore";
 
 interface FileUploadProps {
   onUploadSuccess?: (response: unknown) => void;
@@ -12,6 +12,7 @@ export const FileUpload = ({ onUploadSuccess, onUploadError, category = "cv" }: 
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { addToast } = useToastStore();
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -66,8 +67,9 @@ export const FileUpload = ({ onUploadSuccess, onUploadError, category = "cv" }: 
     try {
       const formData = new FormData();
       selectedFiles.forEach((file) => {
-        formData.append("file", file);
+        formData.append("files", file);
       });
+      formData.append("category", category);
 
       const token = localStorage.getItem("token");
 
@@ -87,13 +89,13 @@ export const FileUpload = ({ onUploadSuccess, onUploadError, category = "cv" }: 
 
       if (!res.ok) {
         let errorMessage = "Upload failed";
-        
+
         if (data.message) {
           errorMessage = data.message;
         } else if (data.error) {
           errorMessage = data.error;
         } else if (data.detail) {
-          errorMessage = Array.isArray(data.detail) 
+          errorMessage = Array.isArray(data.detail)
             ? data.detail.map((d: any) => d.msg).join(", ")
             : data.detail;
         } else if (data.errors) {
@@ -101,10 +103,13 @@ export const FileUpload = ({ onUploadSuccess, onUploadError, category = "cv" }: 
             ? data.errors.map((e: any) => e.message || e.msg || e).join(", ")
             : "Validation failed";
         }
-        
+
+        addToast(errorMessage, "error");
+        onUploadError?.(errorMessage);
         throw new Error(errorMessage);
       }
 
+      addToast("Document uploaded successfully!", "success");
       onUploadSuccess?.(data);
       setSelectedFiles([]);
     } catch (err: unknown) {
@@ -113,13 +118,14 @@ export const FileUpload = ({ onUploadSuccess, onUploadError, category = "cv" }: 
         console.error("Upload error:", err);
         console.error("Error name:", err.name);
         console.error("Error message:", err.message);
-        
+
         if (err.message.includes("Failed to fetch")) {
           message = "CORS Error: The backend server is blocking this request. Please ensure your backend at http://192.168.0.129:8000 has CORS enabled for your frontend origin.";
         } else {
           message = err.message;
         }
       }
+      addToast(message, "error");
       onUploadError?.(message);
     } finally {
       setUploading(false);

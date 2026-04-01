@@ -2,6 +2,7 @@ import { useState } from "react";
 import DashboardLayout from "../components/DashboardLayout";
 import { Sparkles, Save, Copy, Loader2, Wand2, Check, Bot } from "lucide-react";
 import { useToastStore } from "../store/toastStore";
+import { API_ENDPOINTS } from "../lib/api";
 
 export default function NewProposal() {
   const [jobTitle, setJobTitle] = useState("");
@@ -32,7 +33,7 @@ export default function NewProposal() {
         return;
       }
 
-      const res = await fetch("http://192.168.0.129:8000/api/v1/generate-proposal", {
+      const res = await fetch(API_ENDPOINTS.GENERATE_PROPOSAL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

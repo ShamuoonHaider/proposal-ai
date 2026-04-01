@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { useToastStore } from "../store/toastStore";
+import { API_ENDPOINTS } from "../lib/api";
 
 interface FileUploadProps {
   onUploadSuccess?: (response: unknown) => void;
@@ -90,7 +91,7 @@ export const FileUpload = ({ onUploadSuccess, onUploadError, category = "CV / Re
         throw new Error("Authentication token not found. Please sign in again.");
       }
 
-      const res = await fetch("http://192.168.0.129:8000/api/v1/upload-documents", {
+      const res = await fetch(API_ENDPOINTS.UPLOAD_DOCUMENTS, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -145,7 +146,7 @@ export const FileUpload = ({ onUploadSuccess, onUploadError, category = "CV / Re
         console.error("Error message:", err.message);
 
         if (err.message.includes("Failed to fetch")) {
-          message = "CORS Error: The backend server is blocking this request. Please ensure your backend at http://192.168.0.129:8000 has CORS enabled for your frontend origin.";
+          message = "CORS Error: The backend server is blocking this request. Please ensure CORS is enabled for your frontend origin.";
         } else {
           message = err.message;
         }

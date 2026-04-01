@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
 import { useUIStore } from "../store/uiStore";
 import { signUpSchema, type SignUpFormData } from "../lib/validations";
+import { API_ENDPOINTS } from "../lib/api";
 import AuthLayout from "../components/AuthLayout";
 
 export default function SignUp() {
@@ -59,7 +60,7 @@ export default function SignUp() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://192.168.0.129:8000/api/v1/users/signup", {
+      const res = await fetch(API_ENDPOINTS.SIGNUP, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

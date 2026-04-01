@@ -177,7 +177,7 @@ export default function DashboardLayout({
             style={{ borderColor: "var(--border-primary)" }}
           >
             <Link
-              to="/proposals"
+              to="/proposals/new"
               className="flex items-center justify-center gap-2 w-full px-4 py-3 text-white text-sm font-medium rounded-lg transition-colors"
               style={{ backgroundColor: "var(--accent)" }}
               onMouseEnter={(e) =>

@@ -6,6 +6,7 @@ import Documents from "./pages/Documents";
 import MemoryBuilder from "./pages/MemoryBuilder";
 import Settings from "./pages/Settings";
 import Proposals from "./pages/Proposals";
+import NewProposal from "./pages/NewProposal";
 import ToastContainer from "./components/ToastContainer";
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
         <Route path="/documents" element={<Documents />} />
         <Route path="/memory" element={<MemoryBuilder />} />
         <Route path="/proposals" element={<Proposals />} />
+        <Route path="/proposals/new" element={<NewProposal />} />
         <Route path="/settings" element={<Settings />} />
       </Routes>
     </>

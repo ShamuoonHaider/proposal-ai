@@ -7,12 +7,23 @@ interface FileUploadProps {
   category?: string;
 }
 
-export const FileUpload = ({ onUploadSuccess, onUploadError, category = "cv" }: FileUploadProps) => {
+export const FileUpload = ({ onUploadSuccess, onUploadError, category = "CV / Resume" }: FileUploadProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { addToast } = useToastStore();
+
+  // Map frontend categories to backend field names
+  const getCategoryFieldName = (cat: string): string => {
+    const fieldMap: Record<string, string> = {
+      "CV / Resume": "cv",
+      "Portfolio": "portfolio",
+      "Cover Letter": "cover_letter",
+      "LinkedIn PDF": "linkedin",
+      "Certificate": "certificate",
+    };
+    return fieldMap[cat] || "cv";
+  };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -66,10 +77,12 @@ export const FileUpload = ({ onUploadSuccess, onUploadError, category = "cv" }: 
 
     try {
       const formData = new FormData();
+      // Get the correct field name for the selected category
+      const fieldName = getCategoryFieldName(category);
+      // Append each file with the category-specific field name
       selectedFiles.forEach((file) => {
-        formData.append("files", file);
+        formData.append(fieldName, file);
       });
-      formData.append("category", category);
 
       const token = localStorage.getItem("token");
 
@@ -87,29 +100,41 @@ export const FileUpload = ({ onUploadSuccess, onUploadError, category = "cv" }: 
 
       const data = await res.json();
 
+      // Log full response for debugging 422 errors
+      console.log("Backend response status:", res.status);
+      console.log("Backend response data:", data);
+
       if (!res.ok) {
         let errorMessage = "Upload failed";
 
-        if (data.message) {
+        // FastAPI typically returns validation errors in 'detail' field
+        if (data.detail) {
+          console.log("Validation errors:", data.detail);
+          if (Array.isArray(data.detail)) {
+            errorMessage = data.detail
+              .map((d: any) => `${d.loc?.join(".") || "Field"}: ${d.msg}`)
+              .join("; ");
+          } else {
+            errorMessage = typeof data.detail === "string" 
+              ? data.detail 
+              : JSON.stringify(data.detail);
+          }
+        } else if (data.message) {
           errorMessage = data.message;
         } else if (data.error) {
           errorMessage = data.error;
-        } else if (data.detail) {
-          errorMessage = Array.isArray(data.detail)
-            ? data.detail.map((d: any) => d.msg).join(", ")
-            : data.detail;
         } else if (data.errors) {
           errorMessage = Array.isArray(data.errors)
             ? data.errors.map((e: any) => e.message || e.msg || e).join(", ")
             : "Validation failed";
         }
 
-        addToast(errorMessage, "error");
+        useToastStore.error(errorMessage);
         onUploadError?.(errorMessage);
         throw new Error(errorMessage);
       }
 
-      addToast("Document uploaded successfully!", "success");
+      useToastStore.success(`${category} uploaded successfully!`);
       onUploadSuccess?.(data);
       setSelectedFiles([]);
     } catch (err: unknown) {
@@ -125,7 +150,7 @@ export const FileUpload = ({ onUploadSuccess, onUploadError, category = "cv" }: 
           message = err.message;
         }
       }
-      addToast(message, "error");
+      useToastStore.error(message);
       onUploadError?.(message);
     } finally {
       setUploading(false);

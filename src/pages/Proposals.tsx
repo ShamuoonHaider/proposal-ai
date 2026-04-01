@@ -1,6 +1,7 @@
 import { useState } from "react";
 import DashboardLayout from "../components/DashboardLayout";
 import { Sparkles, Save, Copy } from "lucide-react";
+import { useToastStore } from "../store/toastStore";
 
 export default function Proposals() {
   const [jobTitle, setJobTitle] = useState("");
@@ -8,24 +9,88 @@ export default function Proposals() {
   const [generating, setGenerating] = useState(false);
   const [generatedProposal, setGeneratedProposal] = useState<string | null>(null);
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
+    if (!jobTitle || !jobDetails) {
+      useToastStore.error("Please fill in both job title and details");
+      return;
+    }
+
     setGenerating(true);
-    // TODO: Call API to generate proposal
-    setTimeout(() => {
-      setGeneratedProposal("This is a sample generated proposal...");
+
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        useToastStore.error("Authentication required. Please sign in again.");
+        return;
+      }
+
+      const res = await fetch("http://192.168.0.129:8000/api/v1/generate-proposal", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          job_title: jobTitle,
+          job_details: jobDetails,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        let errorMessage = "Failed to generate proposal";
+
+        if (res.status === 401) {
+          errorMessage = "Authentication failed. Please sign in again.";
+        } else if (res.status === 422) {
+          if (data.detail) {
+            errorMessage = Array.isArray(data.detail)
+              ? data.detail.map((d: any) => d.msg).join(", ")
+              : data.detail;
+          }
+        } else if (res.status === 503) {
+          errorMessage = "AI service is currently unavailable. Please try again later.";
+        } else if (data.message) {
+          errorMessage = data.message;
+        } else if (data.error) {
+          errorMessage = data.error;
+        }
+
+        useToastStore.error(errorMessage);
+        return;
+      }
+
+      // Success - extract proposal from response
+      const proposal = data.data?.proposal || data.proposal;
+      setGeneratedProposal(proposal);
+      useToastStore.success("Proposal generated successfully!");
+    } catch (err: unknown) {
+      let message = "Failed to generate proposal";
+      if (err instanceof Error) {
+        if (err.message.includes("Failed to fetch")) {
+          message = "Unable to connect to server. Please check your connection.";
+        } else {
+          message = err.message;
+        }
+      }
+      useToastStore.error(message);
+    } finally {
       setGenerating(false);
-    }, 2000);
+    }
   };
 
   const handleCopy = () => {
     if (generatedProposal) {
       navigator.clipboard.writeText(generatedProposal);
+      useToastStore.success("Proposal copied to clipboard!");
     }
   };
 
   const handleSave = () => {
-    // TODO: Save proposal
-    console.log("Saving proposal...");
+    // TODO: Save proposal to backend
+    useToastStore.info("Save feature coming soon");
   };
 
   return (

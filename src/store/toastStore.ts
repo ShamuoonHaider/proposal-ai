@@ -1,36 +1,34 @@
-import { create } from 'zustand'
+import { toast } from "react-toastify";
 
-export type ToastType = 'success' | 'error' | 'info'
-
-interface Toast {
-  id: string
-  message: string
-  type: ToastType
-}
-
-interface ToastState {
-  toasts: Toast[]
-  addToast: (message: string, type: ToastType) => void
-  removeToast: (id: string) => void
-}
-
-export const useToastStore = create<ToastState>((set) => ({
-  toasts: [],
-  addToast: (message, type) => {
-    const id = Math.random().toString(36).substring(2, 9)
-    set((state) => ({
-      toasts: [...state.toasts, { id, message, type }]
-    }))
-    // Auto-remove after 5 seconds
-    setTimeout(() => {
-      set((state) => ({
-        toasts: state.toasts.filter((toast) => toast.id !== id)
-      }))
-    }, 5000)
+export const useToastStore = {
+  success: (message: string) => {
+    toast.success(message, {
+      position: "top-right",
+      autoClose: 4000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
   },
-  removeToast: (id) => {
-    set((state) => ({
-      toasts: state.toasts.filter((toast) => toast.id !== id)
-    }))
+  error: (message: string) => {
+    toast.error(message, {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
   },
-}))
+  info: (message: string) => {
+    toast.info(message, {
+      position: "top-right",
+      autoClose: 4000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+  },
+};

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   ListFilter,
   Sparkles,
@@ -37,7 +38,7 @@ const SAMPLE_DOCS = [
   },
 ];
 
-function UploadSection() {
+function UploadSection({ category }: { category: string }) {
   const handleUploadSuccess = (response: unknown) => {
     console.log("Upload successful:", response);
     // Toast notification is already shown by FileUpload component
@@ -49,11 +50,21 @@ function UploadSection() {
   };
 
   return (
-    <FileUpload onUploadSuccess={handleUploadSuccess} onUploadError={handleUploadError} />
+    <FileUpload 
+      onUploadSuccess={handleUploadSuccess} 
+      onUploadError={handleUploadError}
+      category={category}
+    />
   );
 }
 
-function CategorizationSection() {
+function CategorizationSection({ 
+  category, 
+  setCategory 
+}: { 
+  category: string; 
+  setCategory: (category: string) => void;
+}) {
   return (
     <div
       className="rounded-xl border p-6 transition-colors"
@@ -75,14 +86,14 @@ function CategorizationSection() {
         Assign a semantic context to your next upload to optimize AI extraction.
       </p>
       <div className="mt-4 space-y-3">
-        {CATEGORIES.map((category, index) => (
+        {CATEGORIES.map((cat) => (
           <label
-            key={category}
+            key={cat}
             className="flex items-center gap-3 px-4 py-3 rounded-lg border cursor-pointer transition-all"
             style={{
               backgroundColor: "var(--bg-primary)",
               borderColor:
-                index === 0
+                category === cat
                   ? "var(--border-secondary)"
                   : "var(--border-primary)",
             }}
@@ -90,7 +101,8 @@ function CategorizationSection() {
             <input
               type="radio"
               name="category"
-              defaultChecked={index === 0}
+              checked={category === cat}
+              onChange={() => setCategory(cat)}
               className="w-4 h-4"
               style={{
                 color: "var(--text-primary)",
@@ -101,7 +113,7 @@ function CategorizationSection() {
               className="text-sm transition-colors"
               style={{ color: "var(--text-secondary)" }}
             >
-              {category}
+              {cat}
             </span>
           </label>
         ))}
@@ -350,6 +362,8 @@ function LibraryOverview() {
 }
 
 export default function Documents() {
+  const [selectedCategory, setSelectedCategory] = useState(CATEGORIES[0]);
+
   return (
     <DashboardLayout>
       <div className="max-w-7xl">
@@ -369,8 +383,7 @@ export default function Documents() {
           <p
             className="mt-2 max-w-3xl"
             style={{ color: "var(--text-secondary)" }}
-          >￼
-
+          >
             Elevate your proposals with architectural precision. Upload,
             categorize, and embed your professional history into the AI
             intelligence engine.
@@ -379,9 +392,12 @@ export default function Documents() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <UploadSection />
+            <UploadSection category={selectedCategory} />
           </div>
-          <CategorizationSection />
+          <CategorizationSection 
+            category={selectedCategory} 
+            setCategory={setSelectedCategory} 
+          />
         </div>
 
         <LibraryOverview />

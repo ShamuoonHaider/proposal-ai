@@ -3,7 +3,6 @@ import { useAuthStore } from "../store/authStore";
 import {
   LayoutDashboard,
   FileText,
-  BrainCircuit,
   Sparkles,
   Settings,
   Plus,

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proposal AI</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-container">
+      <div class="logo-icon">⚡</div>
+      <span class="logo-text">Proposal AI</span>
+    </div>
+    <p class="header-subtitle">Upwork Proposal Assistant</p>
+  </div>
+
+  <!-- Login Section -->
+  <div id="loginSection" class="login-section">
+    <div id="errorMessage" class="error-message"></div>
+
+    <div class="form-group">
+      <label class="form-label" for="email">Email</label>
+      <input class="form-input" type="email" id="email" placeholder="name@company.com" autocomplete="email" />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="password">Password</label>
+      <input class="form-input" type="password" id="password" placeholder="••••••••" autocomplete="current-password" />
+    </div>
+
+    <button class="btn btn-primary" id="signInBtn">
+      <span id="signInText">Sign In</span>
+      <div class="spinner" id="signInSpinner" style="display:none;"></div>
+    </button>
+
+    <div class="divider">
+      <div class="divider-line"></div>
+      <span class="divider-text">or</span>
+      <div class="divider-line"></div>
+    </div>
+
+    <div class="create-account">
+      <span class="create-account-text">Don't have an account? </span>
+      <a class="create-account-link" id="createAccountLink">Create Account</a>
+    </div>
+  </div>
+
+  <!-- Logged In Section -->
+  <div id="loggedInSection" class="logged-in-section">
+    <div class="user-card">
+      <div class="user-info">
+        <div class="user-avatar" id="userAvatar">U</div>
+        <div class="user-details">
+          <div class="user-email" id="userEmail">user@example.com</div>
+          <div class="user-status">
+            <span class="status-dot"></span>
+            Connected
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="instructions">
+      <div class="instructions-title">
+        💡 How to use
+      </div>
+      <div class="instruction-step">
+        <div class="step-number">1</div>
+        <div class="step-text">Go to any Upwork job listing page</div>
+      </div>
+      <div class="instruction-step">
+        <div class="step-number">2</div>
+        <div class="step-text">Click the <strong>"✨ Write Proposal"</strong> button that appears</div>
+      </div>
+      <div class="instruction-step">
+        <div class="step-number">3</div>
+        <div class="step-text">Your AI proposal will be generated and ready to copy</div>
+      </div>
+    </div>
+
+    <button class="btn btn-danger" id="logoutBtn">Log Out</button>
+  </div>
+
+  <!-- Footer -->
+  <div class="popup-footer">
+    <span class="footer-text">Proposal AI v1.0 — Powered by AI</span>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

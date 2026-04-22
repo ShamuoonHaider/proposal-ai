@@ -6,7 +6,6 @@ import {
   FileText,
   Plus,
   Search,
-  MoreVertical,
   Trash2,
   Eye,
   Edit2,

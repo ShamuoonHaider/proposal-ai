@@ -37,7 +37,7 @@ export default function Proposals() {
       }
 
       const res = await fetch(
-        `${API_ENDPOINTS.PROPOSALS}?page=${page}&page_size=20`,
+        `${API_ENDPOINTS.LIST_PROPOSALS}?page=${page}&page_size=20`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -67,7 +67,7 @@ export default function Proposals() {
       }
 
       const res = await fetch(
-        `${API_ENDPOINTS.PROPOSALS}/${id}`,
+        `${API_ENDPOINTS.LIST_PROPOSALS}/${id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -119,7 +119,7 @@ export default function Proposals() {
       }
 
       const res = await fetch(
-        `${API_ENDPOINTS.PROPOSALS}/${proposalToDelete}`,
+        `${API_ENDPOINTS.LIST_PROPOSALS}/${proposalToDelete}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },

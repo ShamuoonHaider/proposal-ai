@@ -3,16 +3,10 @@ import DashboardLayout from "../components/DashboardLayout";
 import { API_ENDPOINTS } from "../lib/api";
 import { useToastStore } from "../store/toastStore";
 import {
-  FolderOpen,
-  Cpu,
   FileText,
   Brain,
   BadgeCheck,
-  Palette,
-  Mail,
-  History,
   Upload,
-  Sparkles,
   Loader2,
   FolderKanban,
   Zap,
@@ -142,7 +136,7 @@ export default function Dashboard() {
       if (!token) return;
 
       // Fetch recent proposals
-      const proposalsRes = await fetch(`${API_ENDPOINTS.PROPOSALS}?page=1&page_size=5`, {
+      const proposalsRes = await fetch(`${API_ENDPOINTS.LIST_PROPOSALS}?page=1&page_size=5`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -238,7 +232,7 @@ export default function Dashboard() {
   };
 
   // Extract tone profile and expertise tags from memory summary
-  const extractMemoryInsights = (summary: string) => {
+  const extractMemoryInsights = (_summary: string) => {
     // Default values
     return {
       toneProfile: "Technical & Precise",
@@ -290,7 +284,7 @@ export default function Dashboard() {
 
     return (
       <div className="h-64 flex items-end justify-between gap-2 px-2 border-b border-[#c4c6cf]/30 relative">
-        {activityTimeline.timeline.map((day, i) => {
+        {activityTimeline.timeline.map((day, _i) => {
           const docPercent = (day.documents / maxValue) * 100 || 5;
           const proposalPercent = (day.proposals / maxValue) * 100 || 5;
           const isToday = new Date(day.date).toDateString() === new Date().toDateString();

@@ -19,7 +19,7 @@ export const FileUpload = ({ onUploadSuccess, onUploadError, category = "CV / Re
     const fieldMap: Record<string, string> = {
       "CV / Resume": "cv",
       "Portfolio": "portfolio",
-      "Cover Letter": "cover_letter",
+      "Sample Proposal": "sample_proposal",
       "LinkedIn PDF": "linkedin",
       "Certificate": "certificate",
     };

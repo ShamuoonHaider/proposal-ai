@@ -11,6 +11,8 @@ import {
   Menu,
   Search,
   Bell,
+  Brain,
+  FileStack,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
@@ -19,8 +21,9 @@ import { ProfileDropdown } from "./ProfileDropdown";
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Documents", href: "/documents", icon: FileText },
-
+  { name: "Memory Bank", href: "/memory", icon: Brain },
   { name: "Proposals", href: "/proposals", icon: Sparkles },
+  { name: "Sample Proposals", href: "/sample-proposals", icon: FileStack },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 

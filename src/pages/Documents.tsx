@@ -12,7 +12,7 @@ import { FileUpload } from "../components/FileUpload";
 const CATEGORIES = [
   "CV / Resume",
   "Portfolio",
-  "Cover Letter",
+  "Sample Proposal",
   "LinkedIn PDF",
   "Certificate",
 ];

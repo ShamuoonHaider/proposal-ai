@@ -3,7 +3,8 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Dashboard from "./pages/Dashboard";
 import Documents from "./pages/Documents";
-
+import MemoryProfile from "./pages/MemoryProfile";
+import SampleProposals from "./pages/SampleProposals";
 import Settings from "./pages/Settings";
 import Proposals from "./pages/Proposals";
 import NewProposal from "./pages/NewProposal";
@@ -19,9 +20,10 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/documents" element={<Documents />} />
-
+        <Route path="/memory" element={<MemoryProfile />} />
         <Route path="/proposals" element={<Proposals />} />
         <Route path="/proposals/new" element={<NewProposal />} />
+        <Route path="/sample-proposals" element={<SampleProposals />} />
         <Route path="/settings" element={<Settings />} />
       </Routes>
     </>

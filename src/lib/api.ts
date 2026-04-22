@@ -4,8 +4,11 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000
 
 export const API_ENDPOINTS = {
   // Auth
-  SIGN_UP: `${API_BASE_URL}/api/v1/signup`,
-  SIGN_IN: `${API_BASE_URL}/api/v1/signin`,
+  SIGN_UP: `${API_BASE_URL}/api/v1/users/signup`,
+  SIGNUP: `${API_BASE_URL}/api/v1/users/signup`,
+  SIGN_IN: `${API_BASE_URL}/api/v1/users/signin`,
+  SIGNIN: `${API_BASE_URL}/api/v1/users/signin`,
+  LOGIN: `${API_BASE_URL}/api/v1/users/login`,
   
   // Documents
   UPLOAD_DOCUMENTS: `${API_BASE_URL}/api/v1/upload-documents`,
@@ -30,7 +33,9 @@ export const API_ENDPOINTS = {
   
   // Dashboard
   DASHBOARD: `${API_BASE_URL}/api/v1/dashboard`,
+  GET_DASHBOARD: `${API_BASE_URL}/api/v1/dashboard`,
   DASHBOARD_ACTIVITY: `${API_BASE_URL}/api/v1/dashboard/activity`,
+  GET_DASHBOARD_ACTIVITY: `${API_BASE_URL}/api/v1/dashboard/activity`,
 };
 
 const api = axios.create({

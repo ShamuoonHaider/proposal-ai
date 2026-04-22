@@ -304,7 +304,9 @@ export default function MemoryProfile() {
       const sectionsToSave = ["identity", "skills", "experience", "preferences"];
 
       for (const section of sectionsToSave) {
-        const sectionData = mapSectionToBackend(section, profile);
+        const sectionDataFull = mapSectionToBackend(section, profile);
+        // The backend expects the data for the specific section
+        const sectionData = sectionDataFull[section as keyof typeof sectionDataFull];
 
         const response = await fetch(API_ENDPOINTS.PATCH_MEMORY_SECTION(section), {
           method: "PATCH",
@@ -313,13 +315,14 @@ export default function MemoryProfile() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            data: sectionData[section as keyof typeof sectionData],
+            data: sectionData,
             merge_strategy: "replace",
           }),
         });
 
         if (!response.ok) {
-          throw new Error(`Failed to save ${section}: ${response.status}`);
+          const errData = await response.json();
+          throw new Error(errData.message || `Failed to save ${section}: ${response.status}`);
         }
       }
 

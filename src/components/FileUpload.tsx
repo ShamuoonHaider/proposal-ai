@@ -113,7 +113,7 @@ export const FileUpload = ({ onUploadSuccess, onUploadError, category = "CV / Re
           console.log("Validation errors:", data.detail);
           if (Array.isArray(data.detail)) {
             errorMessage = data.detail
-              .map((d: any) => `${d.loc?.join(".") || "Field"}: ${d.msg}`)
+              .map((d: { loc?: (string | number)[]; msg: string }) => `${d.loc?.join(".") || "Field"}: ${d.msg}`)
               .join("; ");
           } else {
             errorMessage = typeof data.detail === "string" 
@@ -126,7 +126,10 @@ export const FileUpload = ({ onUploadSuccess, onUploadError, category = "CV / Re
           errorMessage = data.error;
         } else if (data.errors) {
           errorMessage = Array.isArray(data.errors)
-            ? data.errors.map((e: any) => e.message || e.msg || e).join(", ")
+            ? data.errors.map((e: { message?: string; msg?: string } | string) => {
+                if (typeof e === 'string') return e;
+                return e.message || e.msg || "Unknown error";
+              }).join(", ")
             : "Validation failed";
         }
 

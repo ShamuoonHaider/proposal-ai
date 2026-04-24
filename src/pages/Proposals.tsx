@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../components/DashboardLayout";
 import ProposalModal from "../components/ProposalModal";
 import DeleteConfirmModal from "../components/DeleteConfirmModal";
-import { FileText, Eye, Trash2, Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
+import { FileText, Eye, Trash2, Sparkles, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useToastStore } from "../store/toastStore";
 import type { Proposal, PaginationInfo } from "../types/proposal";
 import { API_ENDPOINTS } from "../lib/api";
@@ -35,6 +35,7 @@ export default function Proposals() {
         navigate("/signin");
         return;
       }
+<<<<<<< HEAD
 
       const res = await fetch(
         `${API_ENDPOINTS.LIST_PROPOSALS}?page=${page}&page_size=20`,
@@ -51,6 +52,10 @@ export default function Proposals() {
       const message = err instanceof Error && err.message.includes("Failed to fetch")
         ? "Unable to connect to server."
         : "Failed to fetch proposals";
+=======
+    } catch (error) { const err = error as { response?: { data?: { message?: string } }, message?: string };
+      const message = err.response?.data?.message || err.message || "Failed to fetch proposals";
+>>>>>>> e54f627 (improved UI)
       useToastStore.error(message);
     } finally {
       setLoading(false);
@@ -60,6 +65,7 @@ export default function Proposals() {
   const fetchSingleProposal = async (id: number) => {
     setLoadingProposal(true);
     try {
+<<<<<<< HEAD
       const token = localStorage.getItem("token");
       if (!token) {
         useToastStore.error("Authentication required.");
@@ -79,6 +85,18 @@ export default function Proposals() {
       const message = err instanceof Error && err.message.includes("Failed to fetch")
         ? "Unable to connect to server."
         : "Failed to fetch proposal";
+=======
+      const res = await api.get(API_ENDPOINTS.GET_PROPOSAL(id));
+      
+      const result = res.data;
+      if (result.success && result.data) {
+        setViewProposal(result.data.proposal);
+      } else {
+        throw new Error(result.message || "Failed to fetch proposal details");
+      }
+    } catch (error) { const err = error as { response?: { data?: { message?: string } }, message?: string };
+      const message = err.response?.data?.message || err.message || "Failed to fetch proposal";
+>>>>>>> e54f627 (improved UI)
       useToastStore.error(message);
     } finally {
       setLoadingProposal(false);
@@ -95,15 +113,27 @@ export default function Proposals() {
   };
 
   const handleCopy = () => {
+<<<<<<< HEAD
     if (viewProposal?.proposal) {
       navigator.clipboard.writeText(viewProposal.proposal);
       setCopied(true);
+=======
+    if (viewProposal) {
+      navigator.clipboard.writeText(viewProposal.proposal);
+      setCopied(true);
+      useToastStore.success("Proposal copied to clipboard");
+>>>>>>> e54f627 (improved UI)
       setTimeout(() => setCopied(false), 2000);
     }
   };
 
+<<<<<<< HEAD
   const handleDeleteClick = (id: number, e: React.MouseEvent) => {
     e.stopPropagation();
+=======
+  const handleDeleteClick = (id: number, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+>>>>>>> e54f627 (improved UI)
     setProposalToDelete(id);
     setShowDeleteConfirm(true);
   };
@@ -118,6 +148,7 @@ export default function Proposals() {
         return;
       }
 
+<<<<<<< HEAD
       const res = await fetch(
         `${API_ENDPOINTS.LIST_PROPOSALS}/${proposalToDelete}`,
         {
@@ -127,6 +158,9 @@ export default function Proposals() {
       );
 
       if (res.ok) {
+=======
+      if (res.data.success) {
+>>>>>>> e54f627 (improved UI)
         useToastStore.success("Proposal deleted successfully");
         if (viewProposal?.id === proposalToDelete) handleCloseModal();
         fetchProposals(currentPage);
@@ -134,10 +168,15 @@ export default function Proposals() {
         const data = await res.json();
         useToastStore.error(data.message || "Failed to delete proposal");
       }
+<<<<<<< HEAD
     } catch (err: unknown) {
       const message = err instanceof Error && err.message.includes("Failed to fetch")
         ? "Unable to connect to server."
         : "Failed to delete proposal";
+=======
+    } catch (error) { const err = error as { response?: { data?: { message?: string } }, message?: string };
+      const message = err.response?.data?.message || err.message || "Failed to delete proposal";
+>>>>>>> e54f627 (improved UI)
       useToastStore.error(message);
     } finally {
       setShowDeleteConfirm(false);
@@ -147,7 +186,7 @@ export default function Proposals() {
 
   useEffect(() => {
     fetchProposals(currentPage);
-  }, [currentPage]);
+  }, [currentPage, fetchProposals]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -186,10 +225,7 @@ export default function Proposals() {
         >
           {loading ? (
             <div className="flex items-center justify-center py-16">
-              <div
-                className="w-8 h-8 border-2 rounded-full animate-spin"
-                style={{ borderColor: "var(--border-primary)", borderTopColor: "var(--accent)" }}
-              />
+              <Loader2 className="w-8 h-8 animate-spin" style={{ color: "var(--accent)" }} />
             </div>
           ) : proposals.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16">
@@ -209,8 +245,6 @@ export default function Proposals() {
                 onClick={() => navigate("/proposals/new")}
                 className="mt-6 px-6 py-3 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2"
                 style={{ backgroundColor: "var(--accent)" }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--accent-hover)")}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "var(--accent)")}
               >
                 <Sparkles className="w-4 h-4" />
                 Create Proposal
@@ -301,7 +335,7 @@ export default function Proposals() {
                   style={{ borderColor: "var(--border-primary)" }}
                 >
                   <p className="text-xs font-medium uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>
-                    Showing {proposals.length} of {pagination.total_pages * 20} proposals
+                    Showing {proposals.length} of {pagination.total_items} proposals
                   </p>
                   <div className="flex items-center gap-2">
                     <button
@@ -309,12 +343,6 @@ export default function Proposals() {
                       disabled={!pagination.has_prev}
                       className="p-2 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                       style={{ color: "var(--text-secondary)" }}
-                      onMouseEnter={(e) => {
-                        if (pagination.has_prev) e.currentTarget.style.backgroundColor = "var(--bg-item)";
-                      }}
-                      onMouseLeave={(e) => {
-                        if (pagination.has_prev) e.currentTarget.style.backgroundColor = "transparent";
-                      }}
                     >
                       <ChevronLeft className="w-5 h-5" />
                     </button>
@@ -329,12 +357,6 @@ export default function Proposals() {
                       disabled={!pagination.has_next}
                       className="p-2 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                       style={{ color: "var(--text-secondary)" }}
-                      onMouseEnter={(e) => {
-                        if (pagination.has_next) e.currentTarget.style.backgroundColor = "var(--bg-item)";
-                      }}
-                      onMouseLeave={(e) => {
-                        if (pagination.has_next) e.currentTarget.style.backgroundColor = "transparent";
-                      }}
                     >
                       <ChevronRight className="w-5 h-5" />
                     </button>

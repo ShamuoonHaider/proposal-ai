@@ -1,8 +1,6 @@
 import { useState } from "react";
 import {
   ListFilter,
-  Sparkles,
-  Eye,
   Trash2,
   File,
 } from "lucide-react";
@@ -17,6 +15,7 @@ const CATEGORIES = [
   "Certificate",
 ];
 
+<<<<<<< HEAD
 const SAMPLE_DOCS = [
   {
     name: "Senior_Architect_2024.pdf",
@@ -39,6 +38,15 @@ const SAMPLE_DOCS = [
 ];
 
 function UploadSection({ category }: { category: string }) {
+=======
+function UploadSection({ 
+  category, 
+  onSuccess 
+}: { 
+  category: string; 
+  onSuccess: () => void; 
+}) {
+>>>>>>> e54f627 (improved UI)
   const handleUploadSuccess = (response: unknown) => {
     console.log("Upload successful:", response);
     // Toast notification is already shown by FileUpload component
@@ -363,6 +371,52 @@ function LibraryOverview() {
 
 export default function Documents() {
   const [selectedCategory, setSelectedCategory] = useState(CATEGORIES[0]);
+<<<<<<< HEAD
+=======
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [pagination, setPagination] = useState<PaginationInfo>({
+    page: 1,
+    page_size: 10,
+    total_items: 0,
+    total_pages: 1,
+  });
+
+  const fetchDocuments = useCallback(async (page = 1) => {
+    setIsLoading(true);
+    try {
+      const response = await api.get(`${API_ENDPOINTS.LIST_DOCUMENTS}?page=${page}&page_size=${pagination.page_size}`);
+      const result = response.data;
+      if (result.success && result.data) {
+        setDocuments(result.data.documents || []);
+        setPagination(result.data.pagination);
+      }
+    } catch (error) { const err = error as { response?: { data?: { message?: string } }, message?: string };
+      useToastStore.error(err.response?.data?.message || err.message || "Failed to load documents");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [pagination.page_size]);
+
+  useEffect(() => {
+    fetchDocuments(1);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this document?")) return;
+    
+    try {
+      const response = await api.delete(`${API_ENDPOINTS.LIST_DOCUMENTS}/${id}`);
+      if (response.data.success) {
+        useToastStore.success("Document deleted successfully");
+        fetchDocuments(pagination.page);
+      }
+    } catch (error) { const err = error as { response?: { data?: { message?: string } }, message?: string };
+      useToastStore.error(err.response?.data?.message || err.message || "Failed to delete document");
+    }
+  };
+>>>>>>> e54f627 (improved UI)
 
   return (
     <DashboardLayout>

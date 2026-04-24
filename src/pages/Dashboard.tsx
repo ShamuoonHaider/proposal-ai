@@ -104,7 +104,6 @@ export default function Dashboard() {
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Failed to load dashboard", "error");
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Fetch activity timeline
@@ -126,7 +125,6 @@ export default function Dashboard() {
     } catch (err) {
       console.error("Failed to load activity timeline", err);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Fetch recent activities (proposals and documents)
@@ -162,7 +160,6 @@ export default function Dashboard() {
     } catch (err) {
       console.error("Failed to load recent activities", err);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -177,8 +174,7 @@ export default function Dashboard() {
     };
 
     loadData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchActivityTimeline, fetchDashboardStats, fetchRecentActivities]);
 
   // Format date
   const formatDate = (dateString: string | null) => {
@@ -232,8 +228,9 @@ export default function Dashboard() {
   };
 
   // Extract tone profile and expertise tags from memory summary
-  const extractMemoryInsights = (_summary: string) => {
+  const extractMemoryInsights = (summary: string) => {
     // Default values
+    console.log("Extracting insights from summary length:", summary.length);
     return {
       toneProfile: "Technical & Precise",
       expertiseTags: ["Node.js", "AWS", "React"],
@@ -284,7 +281,7 @@ export default function Dashboard() {
 
     return (
       <div className="h-64 flex items-end justify-between gap-2 px-2 border-b border-[#c4c6cf]/30 relative">
-        {activityTimeline.timeline.map((day, _i) => {
+        {activityTimeline.timeline.map((day) => {
           const docPercent = (day.documents / maxValue) * 100 || 5;
           const proposalPercent = (day.proposals / maxValue) * 100 || 5;
           const isToday = new Date(day.date).toDateString() === new Date().toDateString();

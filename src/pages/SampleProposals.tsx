@@ -80,8 +80,13 @@ export default function SampleProposals() {
         setProposals(result.data.proposals || []);
         setPagination(result.data.pagination || pagination);
       }
+<<<<<<< HEAD
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Failed to load proposals", "error");
+=======
+    } catch (error) { const err = error as { response?: { data?: { message?: string } }, message?: string };
+      showToast(err.response?.data?.message || err.message || "Failed to load proposals", "error");
+>>>>>>> e54f627 (improved UI)
     } finally {
       setIsLoading(false);
     }
@@ -117,6 +122,7 @@ export default function SampleProposals() {
         }),
       });
 
+<<<<<<< HEAD
       if (!response.ok) throw new Error("Failed to create proposal");
 
       showToast("Sample proposal created successfully", "success");
@@ -125,6 +131,16 @@ export default function SampleProposals() {
       fetchProposals(pagination.page);
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Failed to create proposal", "error");
+=======
+      if (response.data.success) {
+        showToast("Sample proposal created successfully", "success");
+        setIsCreateModalOpen(false);
+        resetForm();
+        fetchProposals(pagination.page);
+      }
+    } catch (error) { const err = error as { response?: { data?: { message?: string } }, message?: string };
+      showToast(err.response?.data?.message || err.message || "Failed to create proposal", "error");
+>>>>>>> e54f627 (improved UI)
     } finally {
       setIsSubmitting(false);
     }
@@ -154,6 +170,7 @@ export default function SampleProposals() {
         }),
       });
 
+<<<<<<< HEAD
       if (!response.ok) throw new Error("Failed to update proposal");
 
       showToast("Sample proposal updated successfully", "success");
@@ -163,6 +180,17 @@ export default function SampleProposals() {
       fetchProposals(pagination.page);
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Failed to update proposal", "error");
+=======
+      if (response.data.success) {
+        showToast("Sample proposal updated successfully", "success");
+        setIsEditModalOpen(false);
+        setEditingProposal(null);
+        resetForm();
+        fetchProposals(pagination.page);
+      }
+    } catch (error) { const err = error as { response?: { data?: { message?: string } }, message?: string };
+      showToast(err.response?.data?.message || err.message || "Failed to update proposal", "error");
+>>>>>>> e54f627 (improved UI)
     } finally {
       setIsSubmitting(false);
     }
@@ -176,6 +204,7 @@ export default function SampleProposals() {
       const token = getAuthToken();
       if (!token) throw new Error("Authentication required");
 
+<<<<<<< HEAD
       const response = await fetch(API_ENDPOINTS.SAMPLE_PROPOSAL_DETAIL(id), {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
@@ -187,6 +216,14 @@ export default function SampleProposals() {
       fetchProposals(pagination.page);
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Failed to delete proposal", "error");
+=======
+      if (response.data.success) {
+        showToast("Sample proposal deleted successfully", "success");
+        fetchProposals(pagination.page);
+      }
+    } catch (error) { const err = error as { response?: { data?: { message?: string } }, message?: string };
+      showToast(err.response?.data?.message || err.message || "Failed to delete proposal", "error");
+>>>>>>> e54f627 (improved UI)
     }
   };
 
@@ -206,8 +243,13 @@ export default function SampleProposals() {
       if (result.success && result.data) {
         setViewingProposal(result.data);
       }
+<<<<<<< HEAD
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Failed to load proposal", "error");
+=======
+    } catch (error) { const err = error as { response?: { data?: { message?: string } }, message?: string };
+      showToast(err.response?.data?.message || err.message || "Failed to load proposal", "error");
+>>>>>>> e54f627 (improved UI)
     }
   };
 

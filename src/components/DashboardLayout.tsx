@@ -40,7 +40,7 @@ export default function DashboardLayout({
   // Check auth on mount
   useEffect(() => {
     checkAuth();
-  }, []);
+  }, [checkAuth]);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -53,7 +53,7 @@ export default function DashboardLayout({
   useEffect(() => {
     const saved = localStorage.getItem("theme");
     if (saved) setTheme(saved as "light" | "dark");
-  }, []);
+  }, [setTheme]);
 
   // Apply dark mode class
   useEffect(() => {

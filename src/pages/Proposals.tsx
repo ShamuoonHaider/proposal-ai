@@ -6,7 +6,7 @@ import DeleteConfirmModal from "../components/DeleteConfirmModal";
 import { FileText, Eye, Trash2, Sparkles, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useToastStore } from "../store/toastStore";
 import type { Proposal, PaginationInfo } from "../types/proposal";
-import { API_ENDPOINTS } from "../lib/api";
+import api, { API_ENDPOINTS } from "../lib/api";
 
 interface ProposalsResponse {
   proposals: Proposal[];
@@ -35,27 +35,14 @@ export default function Proposals() {
         navigate("/signin");
         return;
       }
-<<<<<<< HEAD
+      const res = await api.get(`${API_ENDPOINTS.LIST_PROPOSALS}?page=${page}&page_size=20`);
 
-      const res = await fetch(
-        `${API_ENDPOINTS.LIST_PROPOSALS}?page=${page}&page_size=20`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to fetch");
-
+      const data = res.data;
       const proposalsData: ProposalsResponse = data.data || data;
       setProposals(proposalsData.proposals || []);
       setPagination(proposalsData.pagination);
-    } catch (err: unknown) {
-      const message = err instanceof Error && err.message.includes("Failed to fetch")
-        ? "Unable to connect to server."
-        : "Failed to fetch proposals";
-=======
     } catch (error) { const err = error as { response?: { data?: { message?: string } }, message?: string };
       const message = err.response?.data?.message || err.message || "Failed to fetch proposals";
->>>>>>> e54f627 (improved UI)
       useToastStore.error(message);
     } finally {
       setLoading(false);
@@ -65,27 +52,6 @@ export default function Proposals() {
   const fetchSingleProposal = async (id: number) => {
     setLoadingProposal(true);
     try {
-<<<<<<< HEAD
-      const token = localStorage.getItem("token");
-      if (!token) {
-        useToastStore.error("Authentication required.");
-        return;
-      }
-
-      const res = await fetch(
-        `${API_ENDPOINTS.LIST_PROPOSALS}/${id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to fetch");
-
-      setViewProposal(data.data?.proposal || data);
-    } catch (err: unknown) {
-      const message = err instanceof Error && err.message.includes("Failed to fetch")
-        ? "Unable to connect to server."
-        : "Failed to fetch proposal";
-=======
       const res = await api.get(API_ENDPOINTS.GET_PROPOSAL(id));
       
       const result = res.data;
@@ -96,7 +62,6 @@ export default function Proposals() {
       }
     } catch (error) { const err = error as { response?: { data?: { message?: string } }, message?: string };
       const message = err.response?.data?.message || err.message || "Failed to fetch proposal";
->>>>>>> e54f627 (improved UI)
       useToastStore.error(message);
     } finally {
       setLoadingProposal(false);
@@ -113,27 +78,16 @@ export default function Proposals() {
   };
 
   const handleCopy = () => {
-<<<<<<< HEAD
-    if (viewProposal?.proposal) {
-      navigator.clipboard.writeText(viewProposal.proposal);
-      setCopied(true);
-=======
     if (viewProposal) {
       navigator.clipboard.writeText(viewProposal.proposal);
       setCopied(true);
       useToastStore.success("Proposal copied to clipboard");
->>>>>>> e54f627 (improved UI)
       setTimeout(() => setCopied(false), 2000);
     }
   };
 
-<<<<<<< HEAD
-  const handleDeleteClick = (id: number, e: React.MouseEvent) => {
-    e.stopPropagation();
-=======
   const handleDeleteClick = (id: number, e?: React.MouseEvent) => {
     e?.stopPropagation();
->>>>>>> e54f627 (improved UI)
     setProposalToDelete(id);
     setShowDeleteConfirm(true);
   };
@@ -148,35 +102,18 @@ export default function Proposals() {
         return;
       }
 
-<<<<<<< HEAD
-      const res = await fetch(
-        `${API_ENDPOINTS.LIST_PROPOSALS}/${proposalToDelete}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const res = await api.delete(API_ENDPOINTS.DELETE_PROPOSAL(proposalToDelete));
 
-      if (res.ok) {
-=======
       if (res.data.success) {
->>>>>>> e54f627 (improved UI)
         useToastStore.success("Proposal deleted successfully");
         if (viewProposal?.id === proposalToDelete) handleCloseModal();
         fetchProposals(currentPage);
       } else {
-        const data = await res.json();
+        const data = res.data;
         useToastStore.error(data.message || "Failed to delete proposal");
       }
-<<<<<<< HEAD
-    } catch (err: unknown) {
-      const message = err instanceof Error && err.message.includes("Failed to fetch")
-        ? "Unable to connect to server."
-        : "Failed to delete proposal";
-=======
     } catch (error) { const err = error as { response?: { data?: { message?: string } }, message?: string };
       const message = err.response?.data?.message || err.message || "Failed to delete proposal";
->>>>>>> e54f627 (improved UI)
       useToastStore.error(message);
     } finally {
       setShowDeleteConfirm(false);

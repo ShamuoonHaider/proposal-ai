@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import DashboardLayout from "../components/DashboardLayout";
-import { API_ENDPOINTS } from "../lib/api";
+import api, { API_ENDPOINTS } from "../lib/api";
 import { useToastStore } from "../store/toastStore";
 import {
   FileText,
@@ -57,36 +57,19 @@ export default function SampleProposals() {
     useToastStore[type](message);
   };
 
-  const getAuthToken = () => localStorage.getItem("token");
-
   // Fetch proposals
   const fetchProposals = useCallback(async (page = 1) => {
     setIsLoading(true);
     try {
-      const token = getAuthToken();
-      if (!token) throw new Error("Authentication required");
+      const response = await api.get(`${API_ENDPOINTS.SAMPLE_PROPOSALS}?page=${page}&page_size=${pagination.page_size}`);
 
-      const response = await fetch(
-        `${API_ENDPOINTS.SAMPLE_PROPOSALS}?page=${page}&page_size=${pagination.page_size}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      if (!response.ok) throw new Error("Failed to fetch proposals");
-
-      const result = await response.json();
+      const result = await response.data;
       if (result.success && result.data) {
         setProposals(result.data.proposals || []);
         setPagination(result.data.pagination || pagination);
       }
-<<<<<<< HEAD
-    } catch (err) {
-      showToast(err instanceof Error ? err.message : "Failed to load proposals", "error");
-=======
     } catch (error) { const err = error as { response?: { data?: { message?: string } }, message?: string };
       showToast(err.response?.data?.message || err.message || "Failed to load proposals", "error");
->>>>>>> e54f627 (improved UI)
     } finally {
       setIsLoading(false);
     }
@@ -107,31 +90,11 @@ export default function SampleProposals() {
 
     setIsSubmitting(true);
     try {
-      const token = getAuthToken();
-      if (!token) throw new Error("Authentication required");
-
-      const response = await fetch(API_ENDPOINTS.SAMPLE_PROPOSALS, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: formTitle,
-          content: formContent,
-        }),
+      const response = await api.post(API_ENDPOINTS.SAMPLE_PROPOSALS, {
+        title: formTitle,
+        content: formContent,
       });
 
-<<<<<<< HEAD
-      if (!response.ok) throw new Error("Failed to create proposal");
-
-      showToast("Sample proposal created successfully", "success");
-      setIsCreateModalOpen(false);
-      resetForm();
-      fetchProposals(pagination.page);
-    } catch (err) {
-      showToast(err instanceof Error ? err.message : "Failed to create proposal", "error");
-=======
       if (response.data.success) {
         showToast("Sample proposal created successfully", "success");
         setIsCreateModalOpen(false);
@@ -140,7 +103,6 @@ export default function SampleProposals() {
       }
     } catch (error) { const err = error as { response?: { data?: { message?: string } }, message?: string };
       showToast(err.response?.data?.message || err.message || "Failed to create proposal", "error");
->>>>>>> e54f627 (improved UI)
     } finally {
       setIsSubmitting(false);
     }
@@ -155,32 +117,11 @@ export default function SampleProposals() {
 
     setIsSubmitting(true);
     try {
-      const token = getAuthToken();
-      if (!token) throw new Error("Authentication required");
-
-      const response = await fetch(API_ENDPOINTS.SAMPLE_PROPOSAL_DETAIL(editingProposal.id), {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: formTitle,
-          content: formContent,
-        }),
+      const response = await api.patch(API_ENDPOINTS.SAMPLE_PROPOSAL_DETAIL(editingProposal.id), {
+        title: formTitle,
+        content: formContent,
       });
 
-<<<<<<< HEAD
-      if (!response.ok) throw new Error("Failed to update proposal");
-
-      showToast("Sample proposal updated successfully", "success");
-      setIsEditModalOpen(false);
-      setEditingProposal(null);
-      resetForm();
-      fetchProposals(pagination.page);
-    } catch (err) {
-      showToast(err instanceof Error ? err.message : "Failed to update proposal", "error");
-=======
       if (response.data.success) {
         showToast("Sample proposal updated successfully", "success");
         setIsEditModalOpen(false);
@@ -190,7 +131,6 @@ export default function SampleProposals() {
       }
     } catch (error) { const err = error as { response?: { data?: { message?: string } }, message?: string };
       showToast(err.response?.data?.message || err.message || "Failed to update proposal", "error");
->>>>>>> e54f627 (improved UI)
     } finally {
       setIsSubmitting(false);
     }
@@ -201,55 +141,27 @@ export default function SampleProposals() {
     if (!confirm("Are you sure you want to delete this sample proposal?")) return;
 
     try {
-      const token = getAuthToken();
-      if (!token) throw new Error("Authentication required");
+      const response = await api.delete(API_ENDPOINTS.SAMPLE_PROPOSAL_DETAIL(id));
 
-<<<<<<< HEAD
-      const response = await fetch(API_ENDPOINTS.SAMPLE_PROPOSAL_DETAIL(id), {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!response.ok) throw new Error("Failed to delete proposal");
-
-      showToast("Sample proposal deleted successfully", "success");
-      fetchProposals(pagination.page);
-    } catch (err) {
-      showToast(err instanceof Error ? err.message : "Failed to delete proposal", "error");
-=======
       if (response.data.success) {
         showToast("Sample proposal deleted successfully", "success");
         fetchProposals(pagination.page);
       }
     } catch (error) { const err = error as { response?: { data?: { message?: string } }, message?: string };
       showToast(err.response?.data?.message || err.message || "Failed to delete proposal", "error");
->>>>>>> e54f627 (improved UI)
     }
   };
 
   // View proposal details
   const handleView = async (proposal: SampleProposal) => {
     try {
-      const token = getAuthToken();
-      if (!token) throw new Error("Authentication required");
-
-      const response = await fetch(API_ENDPOINTS.SAMPLE_PROPOSAL_DETAIL(proposal.id), {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!response.ok) throw new Error("Failed to fetch proposal details");
-
-      const result = await response.json();
+      const response = await api.get(API_ENDPOINTS.SAMPLE_PROPOSAL_DETAIL(proposal.id));
+      const result = await response.data;
       if (result.success && result.data) {
         setViewingProposal(result.data);
       }
-<<<<<<< HEAD
-    } catch (err) {
-      showToast(err instanceof Error ? err.message : "Failed to load proposal", "error");
-=======
     } catch (error) { const err = error as { response?: { data?: { message?: string } }, message?: string };
       showToast(err.response?.data?.message || err.message || "Failed to load proposal", "error");
->>>>>>> e54f627 (improved UI)
     }
   };
 

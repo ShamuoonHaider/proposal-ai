@@ -249,6 +249,7 @@ export default function Dashboard() {
         d.setDate(d.getDate() - (6 - i));
         return {
           date: d.toISOString(),
+          documents: 0,
           proposals: Math.floor(Math.random() * 5) + 1,
         };
       });

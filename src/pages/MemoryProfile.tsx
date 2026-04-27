@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import DashboardLayout from "../components/DashboardLayout";
 import { useToastStore } from "../store/toastStore";
-import { API_ENDPOINTS } from "../lib/api";
+import api, { API_ENDPOINTS } from "../lib/api";
 import {
   User,
   Briefcase,
@@ -13,10 +13,10 @@ import {
   Edit2,
   ChevronDown,
   Loader2,
+  Check,
   Brain,
   Star,
   Trash2,
-  Check,
 } from "lucide-react";
 
 // Types
@@ -87,11 +87,11 @@ const initialProfile: MemoryProfile = {
   },
   projects: [
     {
-      id: "1",
+      project_id: "1",
       name: "E-commerce API",
       description:
         "High-performance microservices backend for a global retail platform, processing 10k+ requests per second.",
-      techStack: ["FastAPI", "PostgreSQL", "Kubernetes"],
+      tech_stack: ["FastAPI", "PostgreSQL", "Kubernetes"],
       highlights: [
         "Reduced checkout latency by 45% through aggressive caching",
         "Implemented event-driven architecture using Kafka for order processing",
@@ -105,16 +105,12 @@ const initialProfile: MemoryProfile = {
     workType: "Full-Time",
     availability: "Immediately",
   },
-<<<<<<< HEAD
-  memoryScore: 97,
-=======
   strengths: [],
   knowledge_summary: {
     summary: "",
     key_takeaways: [],
   },
   memoryScore: 0,
->>>>>>> e54f627 (improved UI)
 };
 
 // Backend API response types
@@ -196,50 +192,6 @@ const mapBackendToFrontend = (data: BackendMemoryResponse): MemoryProfile => ({
   memoryScore: data.score || 0,
 });
 
-<<<<<<< HEAD
-// Helper to map frontend to backend format for a section
-const mapSectionToBackend = (section: string, profile: MemoryProfile) => {
-  switch (section) {
-    case "identity":
-      return {
-        identity: {
-          full_name: profile.identity.fullName,
-          title: profile.identity.title,
-          experience_level: profile.identity.experienceLevel,
-          years_of_experience: profile.identity.yearsOfExperience,
-        },
-      };
-    case "skills":
-      return {
-        skills: {
-          technical: profile.skills.technical,
-          programming_languages: profile.skills.programmingLanguages,
-          tools: profile.skills.tools,
-          soft_skills: profile.skills.softSkills,
-        },
-      };
-    case "experience":
-      return {
-        experience: {
-          domains: profile.experience.domains,
-          industries: profile.experience.industries,
-          project_types: profile.experience.projectTypes,
-        },
-      };
-    case "preferences":
-      return {
-        preferences: {
-          preferred_stack: profile.preferences.preferredStack,
-          project_size: profile.preferences.projectSize,
-          work_type: profile.preferences.workType,
-          work_mode: profile.preferences.workMode,
-          availability: profile.preferences.availability,
-        },
-      };
-    default:
-      return {};
-  }
-=======
 // Helper to map full frontend profile to backend format
 const mapProfileToBackend = (profile: MemoryProfile) => {
   return {
@@ -282,7 +234,6 @@ const mapProfileToBackend = (profile: MemoryProfile) => {
     strengths: profile.strengths,
     knowledge_summary: profile.knowledge_summary,
   };
->>>>>>> e54f627 (improved UI)
 };
 
 export default function MemoryProfile() {
@@ -312,27 +263,8 @@ export default function MemoryProfile() {
     setError(null);
 
     try {
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error("Authentication required");
-      }
-
-      const response = await fetch(API_ENDPOINTS.GET_MEMORY, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        if (response.status === 404) {
-          // No memory yet - use default empty state
-          setProfile(initialProfile);
-          return;
-        }
-        throw new Error(`Failed to fetch memory: ${response.status}`);
-      }
-
-      const result = await response.json();
+      const response = await api.get(API_ENDPOINTS.GET_MEMORY);
+      const result = await response.data;
 
       if (result.success && result.data) {
         const mapped = mapBackendToFrontend(result.data as BackendMemoryResponse);
@@ -340,12 +272,6 @@ export default function MemoryProfile() {
       } else {
         throw new Error(result.message || "Failed to parse memory data");
       }
-<<<<<<< HEAD
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to load memory";
-      setError(msg);
-      showToast(msg, "error");
-=======
     } catch (error) { const err = error as { response?: { data?: { message?: string }, status?: number }, message?: string };
       if (err.response?.status === 404) {
         setProfile(initialProfile);
@@ -354,7 +280,6 @@ export default function MemoryProfile() {
         setError(msg);
         showToast(msg, "error");
       }
->>>>>>> e54f627 (improved UI)
     } finally {
       setIsLoading(false);
     }
@@ -370,15 +295,6 @@ export default function MemoryProfile() {
     setIsSaving(true);
 
     try {
-<<<<<<< HEAD
-      const token = getAuthToken();
-      if (!token) {
-        throw new Error("Authentication required");
-      }
-
-      // Save each changed section
-      const sectionsToSave = ["identity", "skills", "experience", "preferences"];
-=======
       const backendData = mapProfileToBackend(profile);
       const payload = {
         section: null,
@@ -386,45 +302,15 @@ export default function MemoryProfile() {
         merge_strategy: "replace"
       };
 
-      const response = await api.patch(API_ENDPOINTS.UPDATE_MEMORY, payload);
->>>>>>> e54f627 (improved UI)
-
-      for (const section of sectionsToSave) {
-        const sectionDataFull = mapSectionToBackend(section, profile);
-        // The backend expects the data for the specific section
-        const sectionData = sectionDataFull[section as keyof typeof sectionDataFull];
-
-        const response = await fetch(API_ENDPOINTS.PATCH_MEMORY_SECTION(section), {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            data: sectionData,
-            merge_strategy: "replace",
-          }),
-        });
-
-        if (!response.ok) {
-          const errData = await response.json();
-          throw new Error(errData.message || `Failed to save ${section}: ${response.status}`);
-        }
-      }
+      await api.patch(API_ENDPOINTS.UPDATE_MEMORY, payload);
 
       setHasChanges(false);
       showToast("Memory profile saved successfully", "success");
-<<<<<<< HEAD
 
       // Refresh data to get updated scores
       await fetchMemory();
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to save memory";
-=======
-      await fetchMemory();
     } catch (error) { const err = error as { response?: { data?: { message?: string }, status?: number }, message?: string };
       const msg = err.response?.data?.message || err.message || "Failed to save memory";
->>>>>>> e54f627 (improved UI)
       showToast(msg, "error");
     } finally {
       setIsSaving(false);
@@ -761,63 +647,6 @@ export default function MemoryProfile() {
                 <button onClick={addStrength} className="px-3 py-2 rounded-lg text-sm font-medium" style={{ backgroundColor: "var(--bg-item)", color: "var(--text-muted)" }}><Plus className="w-4 h-4" /></button>
               </div>
             </div>
-<<<<<<< HEAD
-
-            {/* AI Curator Tip */}
-            <div
-              className="rounded-xl p-6"
-              style={{
-                backgroundColor: "#1e1b4b",
-                background: "linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)",
-              }}
-            >
-              <div className="flex items-center gap-2 mb-4">
-                <Sparkles className="w-4 h-4 text-purple-300" />
-                <h2 className="text-xs font-semibold uppercase tracking-wide text-purple-200">
-                  AI Curator Tip
-                </h2>
-              </div>
-
-              <p className="text-sm text-purple-100 mb-6">
-                Your "Memory Score" is high, but adding more detail to your
-                Projects Section could increase proposal win rates by up to 15%.
-              </p>
-
-              <div className="grid grid-cols-2 gap-4 text-xs">
-                <div>
-                  <p className="text-purple-300 uppercase mb-1">Last Updated</p>
-                  <p className="text-purple-100 font-medium flex items-center gap-1">
-                    <Calendar className="w-3 h-3" />
-                    Oct 24, 2023 • 14:32
-                  </p>
-                </div>
-                <div>
-                  <p className="text-purple-300 uppercase mb-1">Profile Created</p>
-                  <p className="text-purple-100 font-medium flex items-center gap-1">
-                    <Calendar className="w-3 h-3" />
-                    Jan 12, 2023
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Footer Actions */}
-            <div className="flex items-center justify-between pt-4">
-              <button
-                className="text-xs font-medium transition-colors"
-                style={{ color: "var(--text-muted)" }}
-              >
-                Export Memory JSON
-              </button>
-              <button
-                className="text-xs font-medium transition-colors"
-                style={{ color: "var(--text-muted)" }}
-              >
-                Duplicate Profile
-              </button>
-            </div>
-=======
->>>>>>> e54f627 (improved UI)
           </div>
         </div>
       </div>

@@ -239,66 +239,55 @@ export default function Dashboard() {
 
   // Render activity bar chart
   const renderActivityChart = () => {
-    if (!activityTimeline?.timeline || activityTimeline.timeline.length === 0) {
-      // Generate mock data for visualization if no real data
-      const mockData = Array.from({ length: 10 }, (_, i) => ({
-        date: `Day ${i + 1}`,
-        documents: Math.floor(Math.random() * 5),
-        proposals: Math.floor(Math.random() * 3),
-      }));
-
-      return (
-        <div className="h-64 flex items-end justify-between gap-2 px-2 border-b border-[#c4c6cf]/30 relative">
-          {mockData.map((day, i) => {
-            const docHeight = Math.max(day.documents * 20, 10);
-            const proposalHeight = Math.max(day.proposals * 20, 10);
-            const isActive = i === mockData.length - 2;
-
-            return (
-              <div
-                key={i}
-                className={`flex-1 flex flex-col justify-end gap-1 h-full ${isActive ? "bg-white/30 rounded-t-lg px-0.5" : ""}`}
-              >
-                <div
-                  className={`w-full rounded-t-sm transition-all ${isActive ? "bg-[#2b0066]" : "bg-[#2b0066]/20"}`}
-                  style={{ height: `${docHeight}%` }}
-                />
-                <div
-                  className={`w-full rounded-t-sm transition-all ${isActive ? "bg-[#1960a3]" : "bg-[#1960a3]/40"}`}
-                  style={{ height: `${proposalHeight}%` }}
-                />
-              </div>
-            );
-          })}
-        </div>
-      );
+    // Get last 7 days of data
+    let displayData = activityTimeline?.timeline || [];
+    
+    if (displayData.length === 0) {
+      // Generate 7-day mock data if none exists
+      displayData = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() - (6 - i));
+        return {
+          date: d.toISOString(),
+          proposals: Math.floor(Math.random() * 5) + 1,
+        };
+      });
+    } else {
+      // Just last 7 entries
+      displayData = displayData.slice(-7);
     }
 
     // Find max values for scaling
-    const maxDocs = Math.max(...activityTimeline.timeline.map((t) => t.documents), 1);
-    const maxProposals = Math.max(...activityTimeline.timeline.map((t) => t.proposals), 1);
-    const maxValue = Math.max(maxDocs, maxProposals, 1);
+    const maxVal = Math.max(...displayData.map((t) => t.proposals), 1);
 
     return (
-      <div className="h-64 flex items-end justify-between gap-2 px-2 border-b border-[#c4c6cf]/30 relative">
-        {activityTimeline.timeline.map((day) => {
-          const docPercent = (day.documents / maxValue) * 100 || 5;
-          const proposalPercent = (day.proposals / maxValue) * 100 || 5;
-          const isToday = new Date(day.date).toDateString() === new Date().toDateString();
+      <div className="h-64 flex items-end justify-between gap-4 px-2 border-b border-[#c4c6cf]/30 relative pb-4">
+        {displayData.map((day) => {
+          const proposalHeight = (day.proposals / maxVal) * 85; // max 85% height
+          
+          const dateObj = new Date(day.date);
+          const dayName = dateObj.toLocaleDateString("en-US", { weekday: 'short' });
+          const isToday = dateObj.toDateString() === new Date().toDateString();
 
           return (
             <div
               key={day.date}
-              className={`flex-1 flex flex-col justify-end gap-1 h-full ${isToday ? "bg-white/30 rounded-t-lg px-0.5" : ""}`}
+              className="flex-1 flex flex-col items-center justify-end gap-3 h-full group"
             >
-              <div
-                className={`w-full rounded-t-sm transition-all ${isToday ? "bg-[#2b0066]" : "bg-[#2b0066]/20"}`}
-                style={{ height: `${Math.max(docPercent, 5)}%` }}
-              />
-              <div
-                className={`w-full rounded-t-sm transition-all ${isToday ? "bg-[#1960a3]" : "bg-[#1960a3]/40"}`}
-                style={{ height: `${Math.max(proposalPercent, 5)}%` }}
-              />
+              <div className="w-full flex justify-center items-end h-full px-2">
+                {/* Proposals Bar */}
+                <div
+                  className={`w-full max-w-[40px] rounded-t-xl transition-all duration-700 relative ${isToday ? "bg-[#1960a3]" : "bg-[#1960a3]/20 group-hover:bg-[#1960a3]/40"}`}
+                  style={{ height: `${Math.max(proposalHeight, 8)}%` }}
+                >
+                   <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#002045] text-white text-[10px] font-black px-2 py-1 rounded shadow-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20">
+                     {day.proposals}
+                   </div>
+                </div>
+              </div>
+              <span className={`text-[10px] font-black uppercase tracking-widest ${isToday ? "text-[#002045]" : "text-[#c4c6cf]"}`}>
+                {dayName}
+              </span>
             </div>
           );
         })}
@@ -441,23 +430,17 @@ export default function Dashboard() {
             <div className="flex justify-between items-center mb-10">
               <div>
                 <h3 className="text-xl font-bold" style={{ color: "#002045" }}>
-                  Activity Timeline
+                  Weekly Output
                 </h3>
-                <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                  Historical daily ingestion vs. output
+                <p className="text-sm font-bold uppercase tracking-widest text-[#1960a3] mt-1">
+                  Proposals Generated
                 </p>
               </div>
               <div className="flex gap-4">
                 <div className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full" style={{ backgroundColor: "#2b0066" }} />
-                  <span className="text-xs font-bold uppercase" style={{ color: "#74777f" }}>
-                    Docs
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
                   <span className="w-3 h-3 rounded-full" style={{ backgroundColor: "#1960a3" }} />
                   <span className="text-xs font-bold uppercase" style={{ color: "#74777f" }}>
-                    Proposals
+                    Volume
                   </span>
                 </div>
               </div>

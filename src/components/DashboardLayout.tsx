@@ -18,6 +18,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { ProfileDropdown } from "./ProfileDropdown";
 
+import logo from "../assets/screen.png";
+
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Documents", href: "/documents", icon: FileText },
@@ -124,29 +126,21 @@ export default function DashboardLayout({
             style={{ borderColor: "var(--border-primary)" }}
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-white"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path d="M12 2L2 22h20L12 2z" />
-                </svg>
+              <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center overflow-hidden">
+                <img src={logo} alt="Proposal AI" className="w-full h-full object-cover" />
               </div>
               <div>
                 <h1
                   className="font-semibold text-lg"
                   style={{ color: "var(--text-primary)" }}
                 >
-                  The Curator
+                  Proposal AI
                 </h1>
                 <p
-                  className="text-xs font-medium tracking-wide"
+                  className="text-[10px] font-bold tracking-widest uppercase"
                   style={{ color: "var(--text-muted)" }}
                 >
-                  AI ENGINE: ACTIVE
+                  The Digital Curator
                 </p>
               </div>
             </div>

@@ -4,7 +4,12 @@
   "version": "1.0.0",
   "description": "Generate AI-powered proposals directly on Upwork job listings",
   "permissions": ["storage", "activeTab"],
-  "host_permissions": ["*://*.upwork.com/*", "*://localhost/*", "http://localhost:8000/*"],
+  "host_permissions": [
+    "*://*.upwork.com/*",
+    "*://localhost/*",
+    "http://localhost:8000/*",
+    "https://proposal-ai-navy.vercel.app/*"
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {

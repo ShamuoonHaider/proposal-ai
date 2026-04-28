@@ -1,7 +1,7 @@
 // Proposal AI — Background Service Worker
 // Handles API calls and token management for content scripts
 
-const API_BASE_URL_DEFAULT = 'https://proposal-ai-back-end.vercel.app';
+const API_BASE_URL_DEFAULT = 'https://proposal-ai-navy.vercel.app';
 
 async function getApiBaseUrl() {
   const result = await chrome.storage.local.get(['apiBaseUrl']);

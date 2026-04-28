@@ -1,7 +1,7 @@
 // Proposal AI — Popup Script
 // Handles login/logout and displays user state
 
-const API_BASE_URL_DEFAULT = 'https://proposal-ai-back-end.vercel.app';
+const API_BASE_URL_DEFAULT = 'https://proposal-ai-navy.vercel.app';
 
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
